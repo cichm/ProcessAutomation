@@ -65,7 +65,6 @@ public final class App {
         socket.close().block();
     }
 
-
     public String generateItems() {
         LOGGER.info("generateItems method was started");
 
@@ -132,6 +131,19 @@ public final class App {
         String details = null;
         try {
             details = mapper.writeValueAsString(order);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // TODO: remove this
+        // example: json String to object
+        List<OrderLine> myObjects = null;
+
+        try {
+            myObjects = mapper.readValue(
+                    details,
+                    mapper.getTypeFactory().constructParametricType(List.class, Object.class)
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }
