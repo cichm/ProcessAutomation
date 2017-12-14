@@ -6,8 +6,8 @@ import io.rsocket.RSocket;
 import io.rsocket.RSocketFactory;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.server.TcpServerTransport;
-import io.rsocket.util.PayloadImpl;
 
+import io.rsocket.util.DefaultPayload;
 import net.usermd.mcichon.body.shop.OrderLine;
 import net.usermd.mcichon.body.shop.Price;
 import net.usermd.mcichon.body.shop.Product;
@@ -56,7 +56,7 @@ public final class App {
         String items = app.generateItems();
 
         socket
-                .requestResponse(new PayloadImpl(""))
+                .requestResponse(DefaultPayload.create("Hello"))
                 .map(Payload::getDataUtf8)
                 .onErrorReturn("error")
                 .doOnNext(System.out::println)
