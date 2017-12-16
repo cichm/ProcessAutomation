@@ -1,7 +1,9 @@
 package net.usermd.mcichon.body.shop;
 
+import lombok.Data;
 import net.functional.library.common.Function;
 
+@Data
 public class Price {
 
   public static final Price ZERO = new Price(0.0);

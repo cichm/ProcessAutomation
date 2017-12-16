@@ -1,15 +1,18 @@
 package net.usermd.mcichon.body.shop;
 
-import net.functional.library.common.Effect;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.functional.library.common.Function;
 
+@Data
+@NoArgsConstructor
 public class Weight {
 
   public static final Weight ZERO = new Weight(0.0);
 
   public static Function<Weight, Function<OrderLine, Weight>> sum = x -> y -> x.add(y.getWeight());
 
-  public final double value;
+  public double value;
 
   private Weight(double value) {
     this.value = value;
@@ -29,10 +32,6 @@ public class Weight {
 
   public Weight mult(int count) {
     return weight(this.value * count);
-  }
-
-  public void bind(Effect<Double> effect) {
-    effect.apply(this.value);
   }
 
   public String toString() {

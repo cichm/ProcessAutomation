@@ -1,23 +1,20 @@
 package net.usermd.mcichon;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.rsocket.AbstractRSocket;
 import io.rsocket.Payload;
 import io.rsocket.RSocket;
 import io.rsocket.RSocketFactory;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.server.TcpServerTransport;
-
 import io.rsocket.util.DefaultPayload;
-import net.usermd.mcichon.body.shop.OrderLine;
-import net.usermd.mcichon.body.shop.Price;
-import net.usermd.mcichon.body.shop.Product;
-import net.usermd.mcichon.body.shop.Weight;
-import org.codehaus.jackson.map.ObjectMapper;
+import net.usermd.mcichon.body.shop.*;
+import net.usermd.mcichon.db.DatabaseDumper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.khuzzuk.messaging.Bus;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 
 import static net.functional.library.common.CollectionUtilities.foldLeft;
@@ -28,9 +25,17 @@ import static net.usermd.mcichon.body.shop.Weight.weight;
 public final class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private Deserializer deserializer;
+    public static Bus bus;
+
+    public App(Deserializer deserializer) {
+        this.deserializer = deserializer;
+    }
 
     public static void main(String[] args) {
         LOGGER.info("main method was started");
+        bus = Bus.initializeBus(false);
+        new DatabaseDumper(bus).init();
 
         RSocketFactory.receive()
                 .acceptor(
@@ -52,14 +57,15 @@ public final class App {
                         .start()
                         .block();
 
-        App app = new App();
+        App app = new App(new Deserializer(new ObjectMapper()));
         String items = app.generateItems();
 
         socket
                 .requestResponse(DefaultPayload.create("Hello"))
                 .map(Payload::getDataUtf8)
-                .onErrorReturn("error")
-                .doOnNext(System.out::println)
+                .map(json -> app.deserializer.readOrderLinesFrom(json))
+                .onErrorReturn(new OrderLines())
+                .doOnNext(orderLines -> bus.send("save", orderLines))
                 .block();
 
         socket.close().block();
@@ -67,8 +73,6 @@ public final class App {
 
     public String generateItems() {
         LOGGER.info("generateItems method was started");
-
-        ObjectMapper mapper = new ObjectMapper();
 
         Product potatoes = new Product("Ziemniaki", price(3.6), weight(4.2));
         Product dictonary = new Product("Słownik", price(14), weight(4.2));
@@ -128,25 +132,12 @@ public final class App {
         Weight weight = foldLeft(order, Weight.ZERO, Weight.sum);
         LOGGER.info("~> Sum weight: " + weight);
 
-        String details = null;
-        try {
-            details = mapper.writeValueAsString(order);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        OrderLines orderLines = new OrderLines(order);
+        String details = deserializer.serialize(orderLines);
 
         // TODO: remove this
         // example: json String to object
-        List<OrderLine> myObjects = null;
-
-        try {
-            myObjects = mapper.readValue(
-                    details,
-                    mapper.getTypeFactory().constructParametricType(List.class, Object.class)
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        OrderLines myObjects = deserializer.readOrderLinesFrom(details);
 
         LOGGER.info("generateItems method was ended");
 
