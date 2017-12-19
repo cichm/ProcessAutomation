@@ -1,6 +1,8 @@
 package net.usermd.mcichon;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import io.rsocket.AbstractRSocket;
 import io.rsocket.Payload;
 import io.rsocket.RSocket;
@@ -8,7 +10,7 @@ import io.rsocket.RSocketFactory;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.server.TcpServerTransport;
 import io.rsocket.util.DefaultPayload;
-import net.usermd.mcichon.body.shop.*;
+import net.usermd.mcichon.body.products.*;
 import net.usermd.mcichon.db.DatabaseDumper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +20,8 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
 
-import static net.usermd.mcichon.body.shop.Price.price;
-import static net.usermd.mcichon.body.shop.Weight.weight;
+import static net.usermd.mcichon.body.products.Price.price;
+import static net.usermd.mcichon.body.products.Weight.weight;
 
 public final class App {
 
@@ -34,7 +36,10 @@ public final class App {
     public static void main(String[] args) {
         LOGGER.info("main method was started");
         bus = Bus.initializeBus(false);
-        new DatabaseDumper(bus).init();
+
+        MongoClient mongo = new MongoClient( "localhost" , 27017 );
+        MongoDatabase mongoDatabase = mongo.getDatabase("ProductsDatabase");
+        new DatabaseDumper(bus, mongoDatabase).init();
 
         RSocketFactory.receive()
                 .acceptor(

@@ -1,11 +1,10 @@
 package net.usermd.mcichon.db;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import lombok.AllArgsConstructor;
-import net.usermd.mcichon.body.shop.Order;
-import net.usermd.mcichon.body.shop.OrderLine;
+import net.usermd.mcichon.body.products.Order;
+import net.usermd.mcichon.body.products.OrderLine;
 import org.bson.Document;
 import pl.khuzzuk.messaging.Bus;
 
@@ -15,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class DatabaseDumper {
     private Bus bus;
+    private MongoDatabase mongoDatabase;
 
     public void init() {
         bus.setReaction("save", this::saveToDB);
@@ -23,9 +23,7 @@ public class DatabaseDumper {
     private void saveToDB(Order order) {
         List<OrderLine> orderLine = order.getOrderLines();
 
-        MongoClient mongo = new MongoClient( "localhost" , 27017 );
-        MongoDatabase database = mongo.getDatabase("myDb");
-        MongoCollection<Document> collection = database.getCollection("sampleCollection");
+        MongoCollection<Document> collection = mongoDatabase.getCollection("products");
 
         List <Document> productLists = new ArrayList <> ();
         for (OrderLine anOrderLine : orderLine) {

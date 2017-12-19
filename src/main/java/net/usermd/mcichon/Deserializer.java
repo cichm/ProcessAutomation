@@ -2,7 +2,7 @@ package net.usermd.mcichon;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.usermd.mcichon.body.shop.Order;
+import net.usermd.mcichon.body.products.Order;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package net.usermd.mcichon.body.shop;
+package net.usermd.mcichon.body.products;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
