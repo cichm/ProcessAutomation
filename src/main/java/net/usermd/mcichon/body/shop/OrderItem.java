@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Product {
-    private String name;
-    private Weight weight;
+public class OrderItem {
+    private Product product;
+    private Price price;
 }

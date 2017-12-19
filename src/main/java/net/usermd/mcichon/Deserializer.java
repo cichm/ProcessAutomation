@@ -2,7 +2,7 @@ package net.usermd.mcichon;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.usermd.mcichon.body.shop.OrderLines;
+import net.usermd.mcichon.body.shop.Order;
 
 import java.io.IOException;
 
@@ -13,16 +13,16 @@ public class Deserializer {
         this.mapper = mapper;
     }
 
-    OrderLines readOrderLinesFrom(String json) {
+    public Order readOrderLinesFrom(String json) {
         try {
-            return mapper.readValue(json, OrderLines.class);
+            return mapper.readValue(json, Order.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new OrderLines();
+        return new Order();
     }
 
-    public String serialize(OrderLines orders) {
+    public String serialize(Order orders) {
         try {
             return mapper.writeValueAsString(orders);
         } catch (JsonProcessingException e) {
