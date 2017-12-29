@@ -8,8 +8,8 @@ import net.usermd.mcichon.body.products.OrderLine;
 import org.bson.Document;
 import pl.khuzzuk.messaging.Bus;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class DatabaseDumper {
@@ -25,14 +25,14 @@ public class DatabaseDumper {
 
         MongoCollection<Document> collection = mongoDatabase.getCollection("products");
 
-        List <Document> productLists = new ArrayList <> ();
-        for (OrderLine anOrderLine : orderLine) {
-            productLists.add(new Document()
-                    .append("product", anOrderLine.getOrderItem().getProduct().getName())
-                    .append("weight", anOrderLine.getOrderItem().getProduct().getWeight().getValue())
-                    .append("price", anOrderLine.getOrderItem().getPrice().getValue()));
-        }
+        List<Document> documents = convertToDocuments(order);
+        collection.insertMany(documents);
+    }
 
-        collection.insertMany(productLists);
+    static List<Document> convertToDocuments(Order order) {
+        return order.getOrderLines().stream()
+                    .map(orderLine1 -> new Document()
+                            .append("product", orderLine1.getOrderItem().getProduct().getName()))
+                    .collect(Collectors.toList());
     }
 }

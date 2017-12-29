@@ -32,8 +32,8 @@ public class Main {
 
         bus = Bus.initializeBus(false);
 
-        MongoClient mongo = new MongoClient( "localhost" , 27017 );
-        MongoDatabase mongoDatabase = mongo.getDatabase("ProductsDatabase");
+        MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
+        MongoDatabase mongoDatabase = mongoClient.getDatabase("ProductsDatabase");
         new DatabaseDumper(bus, mongoDatabase).init();
 
         RSocketFactory.receive()
@@ -66,8 +66,6 @@ public class Main {
                 .onErrorReturn(new Order())
                 .doOnNext(orderLines -> bus.send("save", orderLines))
                 .block();
-
-        socket.close().block();
 
         LOGGER.info("init method was ended");
     }

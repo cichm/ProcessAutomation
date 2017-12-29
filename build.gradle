@@ -11,6 +11,11 @@ repositories {
     maven { url "https://raw.github.com/khuzzuk/MessageBus/mvn-repo/" }
 }
 
+ext {
+    junitJupiterVersion = '5.0.1'
+    junitVintageVersion = '4.12.1'
+}
+
 dependencies {
     implementation 'io.rsocket:rsocket-core:0.9-SNAPSHOT'
     implementation 'io.rsocket:rsocket-transport-netty:0.9-SNAPSHOT'
@@ -23,7 +28,13 @@ dependencies {
 
     compileOnly('org.projectlombok:lombok:1.16.18')
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+    testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testCompile "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testCompile "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+
+    testImplementation 'org.assertj:assertj-core:3.8.0'
 }
 
 jar {
