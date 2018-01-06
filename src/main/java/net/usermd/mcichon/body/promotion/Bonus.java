@@ -1,4 +1,12 @@
 package net.usermd.mcichon.body.promotion;
 
-public class Bonus {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@AllArgsConstructor
+class Bonus {
+    private double value;
 }

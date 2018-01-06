@@ -6,6 +6,8 @@ import net.usermd.mcichon.body.products.Order;
 import net.usermd.mcichon.body.products.OrderItem;
 import net.usermd.mcichon.body.products.OrderLine;
 import net.usermd.mcichon.body.products.Product;
+import net.usermd.mcichon.body.promotion.RoundBonus;
+import net.usermd.mcichon.body.promotion.SetPrice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,9 @@ public class Europe {
 
     public String generateItems() {
         LOGGER.info("generateItems method was started");
+
+        final int RADIUS = 5;
+        RoundBonus roundHole = new RoundBonus(RADIUS);
 
         List<OrderLine> productsList = Arrays.asList(
                 new OrderLine(new OrderItem(new Product("Ziemniaki", weight(2.5)), price(2.5)), 1),
@@ -45,10 +50,10 @@ public class Europe {
                 new OrderLine(new OrderItem(new Product("Skarpetki", weight(0.3)), price(3.0)), 3),
                 new OrderLine(new OrderItem(new Product("Telefon", weight(1.2)), price(400)), 2),
                 new OrderLine(new OrderItem(new Product("Pendrive", weight(0.6)), price(40)), 1),
-                new OrderLine(new OrderItem(new Product("Computer", weight(16)), price(1400)), 3),
                 new OrderLine(new OrderItem(new Product("Banany", weight(3.6)), price(3.2)), 4),
                 new OrderLine(new OrderItem(new Product("Jabłka", weight(3.2)), price(2.8)), 1),
-                new OrderLine(new OrderItem(new Product("Ipod", weight(3.6)), price(160)), 3)
+                new OrderLine(new OrderItem(new Product("Computer", weight(16)), price(SetPrice.initialize(roundHole, 4000))), 3),
+                new OrderLine(new OrderItem(new Product("Ipod", weight(3.6)), price(SetPrice.initialize(roundHole, 160))), 3)
         );
 
         LOGGER.info("generateItems method was ended");
@@ -56,3 +61,4 @@ public class Europe {
         return deserializer.serialize(new Order(productsList));
     }
 }
+
