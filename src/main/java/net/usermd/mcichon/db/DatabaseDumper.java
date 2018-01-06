@@ -4,7 +4,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import lombok.AllArgsConstructor;
 import net.usermd.mcichon.body.products.Order;
-import net.usermd.mcichon.body.products.OrderLine;
 import org.bson.Document;
 import pl.khuzzuk.messaging.Bus;
 
@@ -21,8 +20,6 @@ public class DatabaseDumper {
     }
 
     private void saveToDB(Order order) {
-        List<OrderLine> orderLine = order.getOrderLines();
-
         MongoCollection<Document> collection = mongoDatabase.getCollection("products");
 
         List<Document> documents = convertToDocuments(order);
@@ -32,7 +29,9 @@ public class DatabaseDumper {
     static List<Document> convertToDocuments(Order order) {
         return order.getOrderLines().stream()
                     .map(orderLine1 -> new Document()
-                            .append("product", orderLine1.getOrderItem().getProduct().getName()))
+                            .append("product", orderLine1.getOrderItem().getProduct().getName())
+                            .append("weight", orderLine1.getOrderItem().getProduct().getWeight().getValue())
+                            .append("price", orderLine1.getOrderItem().getPrice().getValue()))
                     .collect(Collectors.toList());
     }
 }
