@@ -2,45 +2,74 @@ group 'net.net.usermd.mcichon'
 version '1.0'
 
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8
 
 repositories {
+    jcenter()
     mavenCentral()
     maven { url 'https://oss.jfrog.org/libs-snapshot' }
     maven { url "https://raw.github.com/khuzzuk/MessageBus/mvn-repo/" }
 }
 
 ext {
+    rsocketRsocketCore              = '0.9-SNAPSHOT'
+    rsocketTransportNettyVersion    = '0.9-SNAPSHOT'
+    slf4jSimpleVersion              = '1.7.25'
+    jacksonDatabindXmlVersion       = '0.6.2'
+    jacksonCoreVersion              = '2.8.6'
+    messageBusVersion               = '1.5.1'
+    mongoDriverVersion              = '3.6.0'
+
+    lombokVersion = '1.16.18'
+
+    mockitoVersion      = '1.10.19'
     junitJupiterVersion = '5.0.1'
     junitVintageVersion = '4.12.1'
+
+    assertjCoreVersion      = '3.8.0'
+    apiguardianApiVersion   = '1.0.0'
 }
 
 dependencies {
-    implementation 'io.rsocket:rsocket-core:0.9-SNAPSHOT'
-    implementation 'io.rsocket:rsocket-transport-netty:0.9-SNAPSHOT'
-    implementation "org.slf4j:slf4j-simple:1.7.25"
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.6'
-    implementation group: 'com.fasterxml', name: 'jackson-xml-databind', version: '0.6.2'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.6'
-    implementation group: 'pl.khuzzuk', name: 'message-bus', version: '1.5.1'
-    implementation 'org.mongodb:mongodb-driver:3.6.0'
+    implementation ("io.rsocket:rsocket-core:$rsocketRsocketCore")
+    implementation ("io.rsocket:rsocket-transport-netty:$rsocketTransportNettyVersion")
+    implementation ("org.slf4j:slf4j-simple:$slf4jSimpleVersion")
+    implementation (group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonCoreVersion)
+    implementation (group: 'com.fasterxml', name: 'jackson-xml-databind', version: jacksonDatabindXmlVersion)
+    implementation (group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonCoreVersion)
+    implementation (group: 'pl.khuzzuk', name: 'message-bus', version: messageBusVersion)
+    implementation ("org.mongodb:mongodb-driver:${mongoDriverVersion}")
 
-    compileOnly('org.projectlombok:lombok:1.16.18')
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
 
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
-    testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testCompile "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testCompile "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+    testCompile(group: 'org.mockito', name: 'mockito-all', version: mockitoVersion)
+    testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+    testCompile("org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+    testCompile("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
 
-    testImplementation 'org.assertj:assertj-core:3.8.0'
+    testImplementation ("org.assertj:assertj-core:$assertjCoreVersion")
+
+    testCompileOnly ("org.apiguardian:apiguardian-api:$apiguardianApiVersion")
 }
 
 jar {
     manifest {
-        attributes(
-                'Main-Class': 'net.net.usermd.mcichon.App'
-        )
+        attributes "Main-Class": 'net.usermd.mcichon.App'
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
     }
 }
